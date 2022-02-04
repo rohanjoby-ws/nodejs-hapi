@@ -44,12 +44,22 @@ export function configDB(metadataOptions = DEFAULT_METADATA_OPTIONS) {
 
     oauthClientScopesMock.findAll = query =>
         oauthClientScopesMock.findById(query);
+
+    const subjectMock = DBConnectionMock.define(
+        'subjects',
+        mockData.MOCK_SUBJECT
+    );
+    subjectMock.findOne = query => subjectMock.findById(query);
+    subjectMock.findAll = query => subjectMock.findById(query);
+    subjectMock.count = () => 1;
+
     return {
         users: userMock,
         oauth_clients: oauthClientsMock,
         oauth_access_tokens: oauthAccessTokensMock,
         oauth_client_resources: oauthClientResourcesMock,
-        oauth_client_scopes: oauthClientScopesMock
+        oauth_client_scopes: oauthClientScopesMock,
+        subjects: subjectMock
     };
 }
 
@@ -64,6 +74,7 @@ export async function mockDB(
     jest.doMock('models', () => {
         const sequelizeData = configDB(metadataOptions);
         if (mockCallback) {
+            // console.log({ sequelizeData: sequelizeData });
             mockCallback(sequelizeData);
         }
         return sequelizeData;
